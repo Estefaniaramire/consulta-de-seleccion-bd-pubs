@@ -377,7 +377,43 @@ FROM titles
 GROUP BY titles.title
 HAVING MIN(YEAR(pubdate)) < 1995
 ORDER BY OldestPublicationDate ASC;
+--Ordenar editoriales por la concatenación de pub_name, city y state
+SELECT pub_name, city, state
+FROM publishers
+ORDER BY CONCAT(pub_name, ', ', city, ', ', state) ASC;
+--Ordenar autores por la concatenación de au_lname y au_fname en orden descendente
+SELECT au_lname, au_fname
+FROM authors
+ORDER BY CONCAT(au_lname, ', ', au_fname) DESC;
+--títulos de libros por la concatenación de title y type en orden ascendente
+SELECT title, type
+FROM titles
+ORDER BY CONCAT(title, ' (', type, ')') ASC;
+--ventas por la concatenación de stor_id, ord_num y title_id en orden ascendente
+SELECT stor_id, ord_num, title_id
+FROM sales
+ORDER BY CONCAT(stor_id, '-', ord_num, '-', title_id) ASC;
+--contar el número de títulos de libros en cada categoría (considerando el texto en minúsculas)
+SELECT LOWER(type) AS LowercaseCategory, COUNT(title_id) AS TotalTitles
+FROM titles
+GROUP BY LOWER(type)
+ORDER BY TotalTitles DESC;
+--Calcular el precio promedio de los libros publicados por cada editorial (considerando el texto en minúsculas)
+SELECT LOWER(pub_name) AS LowercasePublisher, AVG(price) AS AvgPrice
+FROM publishers
+JOIN titles ON publishers.pub_id = titles.pub_id
+GROUP BY LOWER(pub_name)
+ORDER BY AvgPrice DESC;
+--Listar los autores junto con la cantidad total de libros que han escrito (considerando el texto en minúsculas)
+SELECT LOWER(au_lname) AS LowercaseLastName, LOWER(au_fname) AS LowercaseFirstName, COUNT(titleauthor.title_id) AS TotalBooksWritten
+FROM authors
+LEFT JOIN titleauthor ON authors.au_id = titleauthor.au_id
+GROUP BY LOWER(au_lname), LOWER(au_fname)
+ORDER BY TotalBooksWritten DESC;
 --
+
+
+
 
 
 
